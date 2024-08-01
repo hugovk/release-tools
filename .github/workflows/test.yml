@@ -27,7 +27,7 @@ jobs:
       - run: |
           python -m pip install tox
       - run: |
-          tox -e py
+          tox -e py -vvv
 
       - name: Upload coverage
         uses: codecov/codecov-action@v4
