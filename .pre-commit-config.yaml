@@ -21,6 +21,8 @@ repos:
         exclude: windows-release/azure-pipelines.yml
       - id: debug-statements
       - id: end-of-file-fixer
+      - id: file-contents-sorter
+        files: mypy-requirements.txt
       - id: forbid-submodules
       - id: trailing-whitespace
 
