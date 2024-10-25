@@ -427,7 +427,7 @@ def create_cpython_sbom(
             "documentNamespace": f"{artifact_download_location}.spdx.json",
             "creationInfo": {
                 "created": (
-                    datetime.datetime.now(tz=datetime.timezone.utc).strftime(
+                    datetime.datetime.now(tz=datetime.UTC).strftime(
                         "%Y-%m-%dT%H:%M:%SZ"
                     )
                 ),

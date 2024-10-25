@@ -19,13 +19,12 @@ import shutil
 import subprocess
 import sys
 import tempfile
-from collections.abc import Generator
+from collections.abc import Callable, Generator
 from contextlib import contextmanager
 from dataclasses import dataclass
 from pathlib import Path
 from typing import (
     Any,
-    Callable,
     Literal,
     Protocol,
     Self,
@@ -206,7 +205,7 @@ class Tag:
         if proc.returncode != 0:
             error(f"Couldn't fetch the epoch of tag {self.gitname}")
         return datetime.datetime.fromtimestamp(
-            int(proc.stdout.decode().strip()), tz=datetime.timezone.utc
+            int(proc.stdout.decode().strip()), tz=datetime.UTC
         )
 
     @property
