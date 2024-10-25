@@ -2,6 +2,7 @@
 target-version = [ "py39" ]
 
 [tool.ruff]
+target-version = "py39"
 fix = true
 
 lint.select = [
