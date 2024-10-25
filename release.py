@@ -368,9 +368,10 @@ def constant_replace(
     """Inserts in between --start constant-- and --end constant-- in a file"""
     start_tag = comment_start + "--start constants--" + comment_end
     end_tag = comment_start + "--end constants--" + comment_end
-    with open(fn, encoding="ascii") as infile, open(
-        fn + ".new", "w", encoding="ascii"
-    ) as outfile:
+    with (
+        open(fn, encoding="ascii") as infile,
+        open(fn + ".new", "w", encoding="ascii") as outfile,
+    ):
         found_constants = False
         waiting_for_end = False
         for line in infile:
