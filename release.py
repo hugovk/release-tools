@@ -11,6 +11,7 @@ from __future__ import annotations
 import datetime
 import glob
 import hashlib
+import json
 import optparse
 import os
 import re
@@ -19,6 +20,7 @@ import shutil
 import subprocess
 import sys
 import tempfile
+import urllib.request
 from collections.abc import Generator
 from contextlib import contextmanager
 from dataclasses import dataclass
@@ -203,6 +205,13 @@ class Tag:
     @property
     def is_feature_freeze_release(self) -> bool:
         return self.level == "b" and self.serial == 1
+
+    @property
+    def is_security_release(self) -> bool:
+        url = "https://raw.githubusercontent.com/python/devguide/refs/heads/main/include/release-cycle.json"
+        with urllib.request.urlopen(url) as response:
+            data = json.loads(response.read())
+        return str(data[self.basic_version]["status"]) == "security"
 
     @property
     def nickname(self) -> str:
