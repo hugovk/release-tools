@@ -124,12 +124,18 @@ jobs:
           cd cpython
           python ../release.py --export "$CPYTHON_RELEASE" --skip-docs
 
+      - name: "Strip 'v' prefix from CPYTHON_RELEASE if present"
+        id: strip-prefix
+        run: |
+          VERSION="${CPYTHON_RELEASE#v}"
+          echo "version=$VERSION" >> "$GITHUB_OUTPUT"
+
       - name: "Upload the source artifacts"
         uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4.6.2
         with:
           name: source
           path: |
-            cpython/${{ env.CPYTHON_RELEASE }}/src
+            cpython/${{ steps.strip-prefix.outputs.version }}/src
 
   build-docs:
     runs-on: ubuntu-24.04
