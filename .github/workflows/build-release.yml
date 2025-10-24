@@ -51,14 +51,24 @@ jobs:
     runs-on: ubuntu-24.04
     timeout-minutes: 5
     outputs:
+      version: ${{ steps.strip-prefix.outputs.version }}
       build-docs: ${{ steps.select-jobs.outputs.docs }}
       build-android: ${{ steps.select-jobs.outputs.android }}
     steps:
+      - name: "Strip 'v' prefix from CPYTHON_RELEASE if present"
+        id: strip-prefix
+        run: |
+          VERSION="${CPYTHON_RELEASE#v}"
+          echo "version=$VERSION" >> "$GITHUB_OUTPUT"
+
       - name: "Workflow run information"
+        env:
+          VERSION: ${{ steps.strip-prefix.outputs.version }}
         run: |
           echo "git_remote: $GIT_REMOTE"
           echo "git_commit: $GIT_COMMIT"
           echo "cpython_release: $CPYTHON_RELEASE"
+          echo "version: $VERSION"
 
       - name: "Checkout python/release-tools"
         uses: actions/checkout@08c6903cd8c0fde910a37f88322edcfb5dd907a8 # v5.0.0
@@ -124,18 +134,12 @@ jobs:
           cd cpython
           python ../release.py --export "$CPYTHON_RELEASE" --skip-docs
 
-      - name: "Strip 'v' prefix from CPYTHON_RELEASE if present"
-        id: strip-prefix
-        run: |
-          VERSION="${CPYTHON_RELEASE#v}"
-          echo "version=$VERSION" >> "$GITHUB_OUTPUT"
-
       - name: "Upload the source artifacts"
         uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4.6.2
         with:
           name: source
           path: |
-            cpython/${{ steps.strip-prefix.outputs.version }}/src
+            cpython/${{ needs.verify-input.outputs.version }}/src
 
   build-docs:
     runs-on: ubuntu-24.04
@@ -181,6 +185,7 @@ jobs:
     runs-on: ubuntu-24.04
     timeout-minutes: 60
     needs:
+      - verify-input
       - build-source
     steps:
       - name: "Download the source artifacts"
@@ -189,12 +194,14 @@ jobs:
           name: source
 
       - name: "Test Python source tarballs"
+        env:
+          VERSION: ${{ needs.verify-input.outputs.version }}
         run: |
           mkdir -p ./tmp/installation/
-          cp "Python-$CPYTHON_RELEASE.tgz" ./tmp/
+          cp "Python-$VERSION.tgz" ./tmp/
           cd tmp/
-          tar xvf "Python-$CPYTHON_RELEASE.tgz"
-          cd "Python-$CPYTHON_RELEASE"
+          tar xvf "Python-$VERSION.tgz"
+          cd "Python-$VERSION"
 
           ./configure "--prefix=$(realpath '../installation/')"
           make -j
