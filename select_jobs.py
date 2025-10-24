@@ -11,9 +11,16 @@ def output(key: str, value: bool) -> None:
 
 def main() -> None:
     parser = argparse.ArgumentParser()
-    parser.add_argument("version", type=Tag)
+    parser.add_argument("version")
     args = parser.parse_args()
     version = args.version
+
+    if version == "main":
+        output("docs", True)
+        output("android", True)
+        return
+
+    version = Tag(version.removeprefix("v"))
 
     # Docs are only built for stable releases or release candidates.
     output("docs", version.level in ["rc", "f"])

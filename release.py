@@ -343,7 +343,7 @@ def get_arg_parser() -> optparse.OptionParser:
         "--export",
         default=False,
         action="store_true",
-        help="Export the git tag to a tarball and build docs",
+        help="Export the Git tag to a tarball and build docs",
     )
     p.add_option(
         "-u",
@@ -363,7 +363,7 @@ def get_arg_parser() -> optparse.OptionParser:
         "--tag",
         default=False,
         action="store_true",
-        help="Tag the release in Subversion",
+        help="Tag the release in Git",
     )
     p.add_option(
         "-d",
@@ -795,7 +795,7 @@ def main(argv: Any) -> None:
         tagname = os.environ["RELEASE_TAG"]
     else:
         tagname = args[1]
-    tag = Tag(tagname)
+    tag = Tag(tagname.removeprefix("v"))
     if not (options.export or options.upload):
         check_env()
     if options.bump:
