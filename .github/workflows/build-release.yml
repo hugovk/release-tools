@@ -137,7 +137,7 @@ jobs:
         with:
           name: source
           path: |
-            cpython/*/src
+            cpython/${{ env.CPYTHON_VERSION }}/src
 
   build-docs:
     runs-on: ubuntu-24.04
