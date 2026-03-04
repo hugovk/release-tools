@@ -106,7 +106,7 @@ jobs:
         with:
           persist-credentials: false
           repository: "${{ env.GIT_REMOTE }}/cpython"
-          ref: "v${{ env.CPYTHON_RELEASE }}"
+          ref: "${{ env.CPYTHON_RELEASE }}"
           path: "cpython"
 
       - name: "Setup Python"
