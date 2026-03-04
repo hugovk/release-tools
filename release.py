@@ -872,7 +872,7 @@ def main(argv: Any) -> None:
         tagname = os.environ["RELEASE_TAG"]
     else:
         tagname = args[1]
-    tag = Tag(tagname)
+    tag = Tag(tagname.removeprefix("v"))
     if not (options.export or options.upload):
         check_env()
     if options.bump:

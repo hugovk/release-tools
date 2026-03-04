@@ -34,7 +34,7 @@ on:
         description: "Git commit to target for the release. Must use the full commit SHA, not the short ID"
       cpython_release:
         type: string
-        description: "CPython release number (ie '3.11.5', note without the 'v' prefix)"
+        description: "CPython release tag/branch (eg 'v3.11.5', with the 'v' prefix)"
 
 name: "Build release artifacts"
 
@@ -44,7 +44,7 @@ permissions: {}
 env:
   GIT_REMOTE: ${{ github.event.inputs.git_remote || 'python' }}
   GIT_COMMIT: ${{ github.event.inputs.git_commit || 'df793163d5821791d4e7caf88885a2c11a107986' }}
-  CPYTHON_RELEASE: ${{ github.event.inputs.cpython_release || '3.14.2' }}
+  CPYTHON_RELEASE: ${{ github.event.inputs.cpython_release || 'v3.14.3' }}
 
 jobs:
   verify-input:
@@ -70,7 +70,7 @@ jobs:
         with:
           persist-credentials: false
           repository: "${{ env.GIT_REMOTE }}/cpython"
-          ref: "v${{ env.CPYTHON_RELEASE }}"
+          ref: "${{ env.CPYTHON_RELEASE }}"
           path: "cpython"
 
       - name: "Verify CPython commit matches tag"
@@ -143,7 +143,7 @@ jobs:
         with:
           persist-credentials: false
           repository: "${{ env.GIT_REMOTE }}/cpython"
-          ref: "v${{ env.CPYTHON_RELEASE }}"
+          ref: "${{ env.CPYTHON_RELEASE }}"
 
       - name: "Setup Python"
         uses: actions/setup-python@a309ff8b426b58ec0e2a45f0f869d46889d02405 # v6.2.0
@@ -258,7 +258,7 @@ jobs:
         with:
           persist-credentials: false
           repository: "${{ env.GIT_REMOTE }}/cpython"
-          ref: "v${{ env.CPYTHON_RELEASE }}"
+          ref: "${{ env.CPYTHON_RELEASE }}"
 
       - name: Build and test
         run: ./Android/android.py ci --fast-ci "$triplet"
