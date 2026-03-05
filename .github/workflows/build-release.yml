@@ -86,11 +86,6 @@ jobs:
         with:
           python-version: 3.12
 
-      - name: "Set CPython version"
-        id: cpython-version
-        run: |
-          echo "cpython-version=${CPYTHON_RELEASE#v}" >> "$GITHUB_OUTPUT"
-
       - name: "Select jobs"
         id: select-jobs
         run: |
