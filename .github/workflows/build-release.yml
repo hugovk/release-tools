@@ -55,11 +55,28 @@ jobs:
       build-docs: ${{ steps.select-jobs.outputs.docs }}
       build-android: ${{ steps.select-jobs.outputs.android }}
     steps:
+      - name: "Set CPython version"
+        id: cpython-version
+        run: |
+          echo "cpython-version=${CPYTHON_RELEASE#v}" >> "$GITHUB_OUTPUT"
+
       - name: "Workflow run information"
+        env:
+          CPYTHON_VERSION: ${{ steps.cpython-version.outputs.cpython-version }}
         run: |
           echo "git_remote: $GIT_REMOTE"
           echo "git_commit: $GIT_COMMIT"
           echo "cpython_release: $CPYTHON_RELEASE"
+          echo "cpython_version: $CPYTHON_VERSION"
+
+          {
+            echo "| Variable        | Value                |"
+            echo "| --------------- | -------------------- |"
+            echo "| git_remote      | \`$GIT_REMOTE\`      |"
+            echo "| git_commit      | \`$GIT_COMMIT\`      |"
+            echo "| cpython_release | \`$CPYTHON_RELEASE\` |"
+            echo "| cpython_version | \`$CPYTHON_VERSION\` |"
+          } >> "$GITHUB_STEP_SUMMARY"
 
       - name: "Checkout python/release-tools"
         uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # v6.0.2
