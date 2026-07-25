@@ -54,6 +54,7 @@ jobs:
       build-docs: ${{ steps.select-jobs.outputs.docs }}
       build-android: ${{ steps.select-jobs.outputs.android }}
       build-ios: ${{ steps.select-jobs.outputs.ios }}
+      build-macos: ${{ steps.select-jobs.outputs.macos }}
     steps:
       - name: "Workflow run information"
         run: |
@@ -325,3 +326,76 @@ jobs:
           name: ios
           path: cross-build/dist/*
           if-no-files-found: error
+
+  build-macos:
+    name: build-macOS
+    needs:
+      - verify-input
+    if: fromJSON(needs.verify-input.outputs.build-macos)
+    runs-on: macos-15
+    timeout-minutes: 180
+    steps:
+      - name: "Checkout ${{ env.GIT_REMOTE }}/cpython"
+        uses: actions/checkout@9c091bb21b7c1c1d1991bb908d89e4e9dddfe3e0 # v7.0.0
+        with:
+          persist-credentials: false
+          repository: "${{ env.GIT_REMOTE }}/cpython"
+          ref: "v${{ env.CPYTHON_RELEASE }}"
+
+      # Mac/README: the installer build can break if third-party headers or
+      # libraries are visible in /usr/local. Hide them (Homebrew lives in
+      # /opt/homebrew on arm64 runners, but /usr/local may contain strays).
+      - name: "Hide /usr/local headers and libraries"
+        run: |
+          for d in include lib; do
+            if [ -e "/usr/local/$d" ]; then
+              sudo mv "/usr/local/$d" "/usr/local/$d.hidden"
+            fi
+          done
+
+      - name: "Build macOS installer"
+        run: |
+          mkdir -p "$RUNNER_TEMP/installer" "$RUNNER_TEMP/third-party"
+          cd Mac/BuildScript
+          python3 build-installer.py \
+            --universal-archs=universal2 \
+            --dep-target=10.15 \
+            --build-dir="$RUNNER_TEMP/installer" \
+            --third-party="$RUNNER_TEMP/third-party"
+
+      - uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a # v7.0.1
+        with:
+          name: macos
+          path: ${{ runner.temp }}/installer/diskimage/*.dmg
+          if-no-files-found: error
+
+  test-macos:
+    runs-on: macos-15
+    timeout-minutes: 15
+    needs:
+      - build-macos
+    # The unsigned installer is a bundle-format .mpkg;
+    # keep this job advisory until proven on real runners.
+    continue-on-error: true
+    steps:
+      - name: "Download the macOS installer artifact"
+        uses: actions/download-artifact@3e5f45b2cfb9172054b4087a40e8e0b5a5461e7c # v8.0.1
+        with:
+          name: macos
+
+      - name: "Install Python"
+        run: |
+          hdiutil attach -nobrowse -mountpoint /Volumes/Python ./*.dmg
+          sudo installer -pkg /Volumes/Python/Python.mpkg -target /
+          hdiutil detach /Volumes/Python || true
+
+      - name: "Smoke test installed Python"
+        run: |
+          ver="${CPYTHON_RELEASE%.*}"   # e.g. 3.15.0a8 -> 3.15
+          py="/Library/Frameworks/Python.framework/Versions/$ver/bin/python3"
+          "$py" --version
+          "$py" -c "import ssl; print(ssl.OPENSSL_VERSION)"
+          "$py" -c "import sqlite3, lzma, bz2, zlib, ctypes, curses, readline, _decimal"
+          "$py" -c "import tkinter; print(tkinter.TkVersion)"  # no Tk(): headless
+          sh "/Applications/Python $ver/Install Certificates.command"
+          "$py" -c "from urllib.request import urlopen; urlopen('https://www.python.org').close()"
