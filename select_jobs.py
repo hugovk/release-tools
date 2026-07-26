@@ -26,6 +26,7 @@ def main() -> None:
         output("docs", True)
         output("android", True)
         output("ios", True)
+        output("macos", True)
         return
 
     # Docs are only built for stable releases or release candidates.
@@ -36,6 +37,10 @@ def main() -> None:
 
     # iOS binary releases began in Python 3.15.
     output("ios", version.as_tuple() >= (3, 15))
+
+    # CI-built macOS installers began with Python 3.14,
+    # the first version targeting macOS 10.15 and later.
+    output("macos", version.as_tuple() >= (3, 14))
 
 
 if __name__ == "__main__":

@@ -1,5 +1,8 @@
 fix = true
 
+# Vendored snapshot of the macOS installer build process; keep pristine
+extend-exclude = ["macos-installer"]
+
 [lint]
 select = [
   "C4",     # flake8-comprehensions

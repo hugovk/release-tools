@@ -13,6 +13,8 @@ extra_checks = true
 warn_unreachable = true
 
 exclude = [
+  # Vendored snapshot of the macOS installer build process; keep pristine
+  "^macos-installer/",
   "^tests/test_release_tag.py$",
   "^tests/test_run_release.py$",
   "^tests/test_sbom.py$",

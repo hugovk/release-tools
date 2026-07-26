@@ -1,3 +1,8 @@
+# Keep the vendored snapshot of the macOS installer build process
+# (from ned-deily/release-tools branch macos-installer-314) pristine
+# so it stays diffable against its upstream branch
+exclude: ^macos-installer/
+
 repos:
   - repo: https://github.com/astral-sh/ruff-pre-commit
     rev: v0.14.10
