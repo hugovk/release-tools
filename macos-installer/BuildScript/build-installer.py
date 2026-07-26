@@ -329,6 +329,9 @@ def library_recipes():
                     url="https://github.com/facebook/zstd/releases/download/v1.5.7/zstd-1.5.7.tar.gz",
                     checksum="eb33e51f49a15e023950cd7825ca74a4a2b43db8354825ac24fc1b7ee09e6fa3",
                     configure=None,
+                    # No LDFLAGS: a command-line LDFLAGS override would
+                    # discard the Makefile's target-specific `LDFLAGS +=
+                    # -shared`; the link gets the arch flags via CFLAGS.
                     install=f"make -C lib install-pc install-shared install-includes "
                     f"CFLAGS='-O3 -mmacosx-version-min={DEPTARGET} -arch {" -arch ".join(ARCHLIST)}' "
                     f"LDFLAGS='-arch {" -arch ".join(ARCHLIST)}' "
