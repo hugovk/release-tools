@@ -334,7 +334,6 @@ def library_recipes():
                     # -shared`; the link gets the arch flags via CFLAGS.
                     install=f"make -C lib install-pc install-shared install-includes "
                     f"CFLAGS='-O3 -mmacosx-version-min={DEPTARGET} -arch {" -arch ".join(ARCHLIST)}' "
-                    f"LDFLAGS='-arch {" -arch ".join(ARCHLIST)}' "
                     f"PREFIX=/usr/local "
                     f"LIBDIR=/Library/Frameworks/Python.framework/Versions/{getVersion()}/lib "
                     f"DESTDIR={shellQuote(os.path.join(WORKDIR, "libraries"))} "
