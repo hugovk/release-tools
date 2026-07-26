@@ -317,6 +317,30 @@ def library_recipes():
         ]
     )
 
+    if getVersionMajorMinor() >= (3, 14):
+        # Local addition, not yet in the upstream macos-installer snapshot:
+        # Python 3.14 added compression.zstd (PEP 784), so bundle a shared
+        # libzstd in the framework like the other shared third-party
+        # libraries (python.org installers ship libzstd 1.5.7).
+        result.extend(
+            [
+                dict(
+                    name="Zstandard 1.5.7",
+                    url="https://github.com/facebook/zstd/releases/download/v1.5.7/zstd-1.5.7.tar.gz",
+                    checksum="eb33e51f49a15e023950cd7825ca74a4a2b43db8354825ac24fc1b7ee09e6fa3",
+                    configure=None,
+                    install=f"make -C lib install-pc install-shared install-includes "
+                    f"CFLAGS='-O3 -mmacosx-version-min={DEPTARGET} -arch {" -arch ".join(ARCHLIST)}' "
+                    f"LDFLAGS='-arch {" -arch ".join(ARCHLIST)}' "
+                    f"PREFIX=/usr/local "
+                    f"LIBDIR=/Library/Frameworks/Python.framework/Versions/{getVersion()}/lib "
+                    f"DESTDIR={shellQuote(os.path.join(WORKDIR, "libraries"))} "
+                    f"&& cd {shellQuote(os.path.join(WORKDIR, "libraries"))}/usr/local/lib "
+                    f"&& ln -fs ../../../Library/Frameworks/Python.framework/Versions/{getVersion()}/lib/lib* .",
+                ),
+            ]
+        )
+
     return result
 
 
@@ -1112,6 +1136,8 @@ def buildPythonFramework(python_framework_name, buildDir, configure_options):
         f"LIBMPDEC_LIBS='-L{workDirUsrLocalLib} -lmpdec -lm' "
         f"LIBSQLITE3_CFLAGS='-I{workDirUsrLocalInclude}' "
         f"LIBSQLITE3_LIBS='-L{workDirUsrLocalLib} -lsqlite3' "
+        f"LIBZSTD_CFLAGS='-I{workDirUsrLocalInclude}' "
+        f"LIBZSTD_LIBS='-L{workDirUsrLocalLib} -lzstd' "
         f"TCLTK_CFLAGS='-I{workDirUsrLocalInclude}' "
         f"TCLTK_LIBS='-L{workDirUsrLocalLib} -ltcl -ltk' "
         f"2>&1"
