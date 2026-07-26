@@ -405,7 +405,15 @@ jobs:
         run: |
           ver="${CPYTHON_RELEASE%.*}"   # e.g. 3.15.0a8 -> 3.15
           hdiutil attach -nobrowse -mountpoint /Volumes/Python ./*.dmg
-          sudo installer -pkg /Volumes/Python/Python.mpkg -target /
+          # installer(8) on modern macOS refuses the deprecated bundle-format
+          # .mpkg, so extract the framework payload directly. Replace with
+          # `sudo installer -pkg ... -target /` once the flat-package
+          # (pkgbuild/productbuild) follow-up lands.
+          fw="/Library/Frameworks/Python.framework"
+          sudo mkdir -p "$fw"
+          sudo tar -xzf \
+            "/Volumes/Python/Python.mpkg/Contents/Packages/PythonFramework-$ver.pkg/Contents/Archive.pax.gz" \
+            -C "$fw"
           hdiutil detach /Volumes/Python || true
 
       - name: "Smoke test installed Python"
