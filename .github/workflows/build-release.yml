@@ -403,6 +403,7 @@ jobs:
 
       - name: "Install Python"
         run: |
+          ver="${CPYTHON_RELEASE%.*}"   # e.g. 3.15.0a8 -> 3.15
           hdiutil attach -nobrowse -mountpoint /Volumes/Python ./*.dmg
           sudo installer -pkg /Volumes/Python/Python.mpkg -target /
           hdiutil detach /Volumes/Python || true
