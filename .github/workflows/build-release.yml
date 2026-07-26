@@ -439,9 +439,8 @@ jobs:
           "$py" -c "import ssl; print(ssl.OPENSSL_VERSION)"
           "$py" -c "import sqlite3, lzma, bz2, zlib, ctypes, curses, readline, _decimal"
           "$py" -c "import tkinter; print(tkinter.TkVersion)"  # no Tk(): headless
-          # No zstd recipe yet in the macos-installer BuildScript snapshot
-          "$py" -c "import _zstd" \
-            || echo "::warning::_zstd is not available in this build"
+          # compression.zstd is new in Python 3.14
+          "$py" -c "import sys; sys.version_info >= (3, 14) and __import__('_zstd')"
           # The real installer runs ensurepip in a postinstall script
           sudo "$py" -m ensurepip
           "$py" -m pip --version
