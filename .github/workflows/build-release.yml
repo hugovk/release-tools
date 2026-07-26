@@ -342,6 +342,24 @@ jobs:
           repository: "${{ env.GIT_REMOTE }}/cpython"
           ref: "v${{ env.CPYTHON_RELEASE }}"
 
+      - name: "Setup Python"
+        uses: actions/setup-python@ece7cb06caefa5fff74198d8649806c4678c61a1 # v6.3.0
+        with:
+          python-version: 3.12
+
+      # build-installer.py embeds the HTML docs in the framework. Build them
+      # here with a modern Python and put the tarball in the third-party
+      # cache; otherwise build-installer.py runs Doc's `make venv` under the
+      # macOS system Python, which is too old for Doc/requirements.txt.
+      - name: "Build docs for the installer"
+        env:
+          SPHINXOPTS: "-j10"
+        run: |
+          python -m pip install -r Doc/requirements.txt
+          make -C Doc dist-html
+          mkdir -p "$RUNNER_TEMP/third-party"
+          cp Doc/dist/python-*-docs-html.tar.bz2 "$RUNNER_TEMP/third-party/"
+
       # Mac/README: the installer build can break if third-party headers or
       # libraries are visible in /usr/local. Hide them (Homebrew lives in
       # /opt/homebrew on arm64 runners, but /usr/local may contain strays).
