@@ -933,6 +933,9 @@ sigstore-models==0.0.6 \
 sigstore-rekor-types==0.0.18 \
     --hash=sha256:b62bf38c5b1a62bc0d7fe0ee51a0709e49311d137c7880c329882a8f4b2d1d78
     # via sigstore
+termcolor==3.3.0 \
+    --hash=sha256:cf642efadaf0a8ebbbf4bc7a31cec2f9b5f21a9f726f4ccbb08192c9c26f43a5
+    # via -r requirements.in
 tuf==6.0.0 \
     --hash=sha256:458f663a233d95cc76dde0e1a3d01796516a05ce2781fefafebe037f7729601a
     # via sigstore

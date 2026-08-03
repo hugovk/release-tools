@@ -32,6 +32,7 @@ import paramiko
 import sigstore.models
 import sigstore.oidc
 from alive_progress import alive_bar
+from termcolor import colored, cprint
 
 import release as release_mod
 import sbom
@@ -236,15 +237,15 @@ class ReleaseDriver:
         if not self.db.get("security_release"):
             self.db["security_release"] = self.db["release"].is_security_release
 
-        print("Release data: ")
-        print(f"- Branch: {release_tag.branch}")
-        print(f"- Release tag: {self.db['release']}")
-        print(f"- Normalized release tag: {release_tag.normalized()}")
-        print(f"- Git repo: {self.db['git_repo']}")
-        print(f"- SSH username: {self.db['ssh_user']}")
-        print(f"- SSH key: {self.db['ssh_key'] or 'Default'}")
-        print(f"- Sign with GPG: {self.db['sign_gpg']}")
-        print(f"- Security release: {self.db['security_release']}")
+        cprint("Release data: ", attrs=["bold"])
+        print(f"- Branch: {colored(release_tag.branch, 'cyan')}")
+        print(f"- Release tag: {colored(self.db['release'], 'cyan')}")
+        print(f"- Normalized release tag: {colored(release_tag.normalized(), 'cyan')}")
+        print(f"- Git repo: {colored(self.db['git_repo'], 'cyan')}")
+        print(f"- SSH username: {colored(self.db['ssh_user'], 'cyan')}")
+        print(f"- SSH key: {colored(self.db['ssh_key'] or 'Default', 'cyan')}")
+        print(f"- Sign with GPG: {colored(self.db['sign_gpg'], 'cyan')}")
+        print(f"- Security release: {colored(self.db['security_release'], 'cyan')}")
         print()
 
     def checkpoint(self) -> None:
@@ -252,7 +253,7 @@ class ReleaseDriver:
 
     def run(self) -> None:
         for task in self.completed_tasks:
-            print(f"✅  {task.description}")
+            print(f"✅  {colored(task.description, 'green')}")
 
         self.current_task = next(self.remaining_tasks, None)
         while self.current_task is not None:
@@ -260,14 +261,18 @@ class ReleaseDriver:
             try:
                 self.current_task(self.db)
             except Exception as e:
-                print(f"\r💥  {self.current_task.description}")
+                print(f"\r💥  {colored(self.current_task.description, 'red')}")
                 raise e from None
-            print(f"\r✅  {self.current_task.description}")
+            print(f"\r✅  {colored(self.current_task.description, 'green')}")
             self.completed_tasks.append(self.current_task)
             self.current_task = next(self.remaining_tasks, None)
         self.db["finished"] = True
         print()
-        print(f"Congratulations, Python {self.db['release']} is released 🎉🎉🎉")
+        cprint(
+            f"Congratulations, Python {self.db['release']} is released 🎉🎉🎉",
+            "green",
+            attrs=["bold"],
+        )
 
 
 @contextlib.contextmanager
@@ -385,9 +390,9 @@ def check_buildbots(db: ReleaseShelf) -> None:
     if not failing_builders:
         return
     print()
-    print("The following buildbots are failing:")
+    cprint("The following buildbots are failing:", "red")
     for builder in failing_builders:
-        print(f"- {builder.name}")
+        print(f"- {colored(builder.name, 'red')}")
     print()
     print("Check https://buildbot.python.org/all/#/release_status for more information")
     print()
@@ -452,7 +457,7 @@ def check_magic_number(db: ReleaseShelf) -> None:
     else:
 
         def out(msg: str) -> None:
-            print("warning:", msg, file=sys.stderr, flush=True)
+            print(colored("warning:", "yellow"), msg, file=sys.stderr, flush=True)
 
     def get_magic(source: Path, regex: re.Pattern[str]) -> str:
         if m := regex.search(source.read_text()):
@@ -610,7 +615,7 @@ def wait_for_build_release(db: ReleaseShelf) -> None:
             ]
         )
 
-    print("Once the build-release workflow is complete:")
+    cprint("Once the build-release workflow is complete:", attrs=["bold"])
     print("- Download its artifacts from the workflow summary page.")
     print(f"- Copy the following files into {release_path}:")
     for path in wait_for_paths:
@@ -949,7 +954,7 @@ def start_windows_build(db: ReleaseShelf) -> None:
     origin_remote_url = get_origin_remote_url(db["git_repo"])
     origin_remote_github_owner = extract_github_owner(origin_remote_url)
 
-    print("Start the Windows build:")
+    cprint("Start the Windows build:", attrs=["bold"])
     print(
         "Go to\thttps://dev.azure.com/Python/cpython/_build?definitionId=21&_a=summary"
     )
@@ -1406,14 +1411,15 @@ def main() -> None:
     assert isinstance(auth_key, str), "We need an AUTH_INFO env var or --auth-key"
 
     if sys.platform not in ("darwin", "linux"):
-        print(
+        cprint(
             """\
 WARNING! This script has not been tested on a platform other than Linux and macOS.
 
 Although it should work correctly as long as you have all the dependencies,
 some things may not work as expected. As a release manager, you should try to
 fix these things in this script so it also supports your platform.
-"""
+""",
+            "yellow",
         )
         if not ask_question("Do you want to continue?"):
             raise ReleaseException(

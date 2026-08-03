@@ -6,3 +6,4 @@ python-gnupg
 aiohttp
 blurb>=1.2.1
 sigstore>=4.5.0
+termcolor
