@@ -7,4 +7,5 @@ pytest-mock
 python-gnupg  # untyped :(
 requests>=2.34
 sigstore==4.5.0
+termcolor
 types-paramiko
