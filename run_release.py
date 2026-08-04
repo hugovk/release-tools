@@ -956,26 +956,31 @@ def start_windows_build(db: ReleaseShelf) -> None:
 
     cprint("Start the Windows build:", attrs=["bold"])
     print(
-        "Go to\thttps://dev.azure.com/Python/cpython/_build?definitionId=21&_a=summary"
+        "Go to\t"
+        + colored(
+            "https://dev.azure.com/Python/cpython/_build?definitionId=21&_a=summary",
+            "cyan",
+        )
     )
-    print("Click:\t'Run pipeline'")
+    print(f"Click:\t{colored('Run pipeline', 'cyan')}")
     print()
-    print("Pipeline version")
+    cprint("Pipeline version", attrs=["bold"])
     print()
-    print("Select pipeline version by branch/tag:\tleave 'main'")
-    print("Commit:\tleave blank")
+    print(f"Select pipeline version by branch/tag:\tleave {colored('main', 'cyan')}")
+    print(f"Commit:\tleave {colored('blank', 'cyan')}")
+
     print()
-    print("Pipeline version")
+    cprint("Pipeline version", attrs=["bold"])
     print()
-    print(f"Git remote:\t{origin_remote_github_owner}")
-    print("If Other, specify Git remote:\tleave 'python'")
-    print(f"Git tag:\t{db['release'].gitname}")
-    print(f"Git commit:\t{commit_sha}")
-    print("[x] Publish release")
-    print("Check the version specific boxes")
+    print(f"Git remote:\t{colored(origin_remote_github_owner, 'cyan')}")
+    print(f"If Other, specify Git remote:\tleave {colored('python', 'cyan')}")
+    print(f"Git tag:\t{colored(db['release'].gitname, 'cyan')}")
+    print(f"Git commit:\t{colored(commit_sha, 'cyan')}")
+    cprint("[x] Publish release", "yellow")
+    cprint("Check the version specific boxes", "yellow")
     print()
-    print("Click:\t'Next: Resources'")
-    print("Click:\t'Run'")
+    print(f"Click:\t{colored('Next: Resources', 'cyan')}")
+    print(f"Click:\t{colored('Run', 'cyan')}")
     print()
 
     if not ask_question("Have you started the Windows build?"):
