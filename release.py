@@ -35,6 +35,8 @@ from typing import (
 )
 from urllib.request import urlopen
 
+from termcolor import colored
+
 COMMASPACE = ", "
 SPACE = " "
 tag_cre = re.compile(r"(\d+)(?:\.(\d+)(?:\.(\d+))?)?(?:([ab]|rc)(\d+))?$")
@@ -296,15 +298,15 @@ def run_cmd(
 
 def ask_question(question: str) -> bool:
     answer = ""
-    print(question)
+    print(colored(question, attrs=["bold"]))
     while answer not in ("yes", "no"):
-        answer = input("Enter yes or no: ")
+        answer = input(colored("Enter yes or no: ", "cyan"))
         if answer == "yes":
             return True
         elif answer == "no":
             return False
         else:
-            print("Please enter yes or no.")
+            print(colored("Please enter yes or no.", "yellow"))
     return True
 
 
