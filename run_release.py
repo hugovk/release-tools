@@ -994,13 +994,20 @@ def send_email_to_platform_release_managers(db: ReleaseShelf) -> None:
     github_prefix = f"https://github.com/{origin_remote_github_owner}/cpython/tree"
 
     print()
-    print(f"{github_prefix}/{db['release'].gitname}")
-    print(f"Git commit SHA: {commit_sha}")
+    print(colored(f"{github_prefix}/{db['release'].gitname}", "cyan"))
+    print(f"Git commit SHA: {colored(commit_sha, 'cyan')}")
     print(
-        "build-release workflow: https://github.com/python/release-tools/actions/runs/[ENTER-RUN-ID-HERE]"
+        "build-release workflow: "
+        + colored("https://github.com/python/release-tools/actions/runs/", "cyan")
+        + colored("[ENTER-RUN-ID-HERE]", "yellow")
     )
     print(
-        "Windows build: https://dev.azure.com/Python/cpython/_build/results?buildId=[ENTER-BUILD-ID-HERE]&view=results"
+        "Windows build: "
+        + colored(
+            "https://dev.azure.com/Python/cpython/_build/results?buildId=", "cyan"
+        )
+        + colored("[ENTER-BUILD-ID-HERE]", "yellow")
+        + colored("&view=results", "cyan")
     )
     print()
 
