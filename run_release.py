@@ -944,7 +944,11 @@ def start_build_release(db: ReleaseShelf) -> None:
     # We ask for human verification at this point since this commit SHA is 'locked in'
     print()
     print(
-        f"Go to https://github.com/{origin_remote_github_owner}/cpython/commit/{commit_sha}"
+        "Go to "
+        + colored(
+            f"https://github.com/{origin_remote_github_owner}/cpython/commit/{commit_sha}",
+            "cyan",
+        )
     )
     print("- Ensure that the commit diff does not contain any unexpected changes.")
     print(
@@ -967,7 +971,11 @@ def start_build_release(db: ReleaseShelf) -> None:
     )
     subprocess.check_call(shlex.split(cmd))
     print(
-        "Go to https://github.com/python/release-tools/actions/workflows/build-release.yml"
+        "Go to "
+        + colored(
+            "https://github.com/python/release-tools/actions/workflows/build-release.yml",
+            "cyan",
+        )
     )
     print()
 
